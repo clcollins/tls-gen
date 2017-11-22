@@ -16,10 +16,10 @@ sign () {
   openssl x509 -req \
           -days 365 \
           -sha256 \
-          -in ${HOST_NAME}/${HOST_NAME}.csr \
+          -in ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.csr \
           -CA ${CA_NAME}/${CA_NAME}.crt \
           -CAkey ${CA_NAME}/${CA_NAME}.key \
-          -CAcreateserial -out ${HOST_NAME}/${HOST_NAME}.crt
+          -CAcreateserial -out ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.crt
 }
 
 mk_ca () {
@@ -29,12 +29,13 @@ mk_ca () {
   if [[ ! -d $(pwd)/${CA_NAME} ]]
   then
     mkdir $CA_NAME
-    openssl genrsa -aes256 \
-	    -out ${CA_NAME}/${CA_NAME}.key \
-	    4096
-    openssl req -new -x509 \
-	    -days 365 \
-	    -key ${CA_NAME}/${CA_NAME}.key \
+    openssl req \
+      -new \
+      -x509 \
+      -nodes \
+	    -days 3650 \
+      -newkey rsa:4096 \
+	    -keyout ${CA_NAME}/${CA_NAME}.key \
 	    -out ${CA_NAME}/${CA_NAME}.crt
   else
     echo "Trying to create a CA key for an existing CA! This shouldn't happen!"
@@ -45,17 +46,20 @@ mk_ca () {
 mk_csr () {
 
   HOST_NAME="${1}"
+  CA_NAME="${2}"
 
-  if [[ ! -d $(pwd)/${HOST_NAME} ]]
+  if [[ ! -d $(pwd)/${CA_NAME}/${HOST_NAME} ]]
   then
-    mkdir $HOST_NAME
-    openssl genrsa -out ${HOST_NAME}/${HOST_NAME}.key 4096
-    openssl req -subj "/CN=${HOST_NAME}" \
-                -sha256 \
-                -new \
-  	        -key ${HOSTDIR}/${HOST_NAME}.key \
-  	        -out ${HOSTDIR}/${HOST_NAME}.csr
+    mkdir ${CA_NAME}/$HOST_NAME
+  else
+    echo "$(pwd)/${CA_NAME}/${HOST_NAME} already exists"
   fi
+  openssl genrsa -out ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.key 4096
+  openssl req -subj "/CN=${HOST_NAME}" \
+              -sha256 \
+              -new \
+          -key ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.key \
+          -out ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.csr
 }
 
 main () {
@@ -75,10 +79,14 @@ main () {
 
   if [[ ! -d $CA_NAME ]]
   then
+    echo "Creating CA: $CA_NAME"
     mk_ca $CA_NAME
   fi
 
-  mk_csr $HOST_NAME
+  echo "Creating CSR for Host: $HOST_NAME"
+  mk_csr $HOST_NAME $CA_NAME
+
+  echo "Signing CRT for Host $HOST_NAME using CA $CA_NAME"
   sign $HOST_NAME $CA_NAME
 
 }
