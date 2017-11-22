@@ -20,6 +20,8 @@ usage () {
   echo ""
   echo "If directory CA_NAME exists, cert will be signed by that CA"
   echo "If directory CA_NAME does not exist, a new CA will be created and used"
+  echo ""
+  echo "Keys and certs for hosts will be created under the directory of the CA that signs them."
 }
 
 sign () {
