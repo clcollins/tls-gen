@@ -47,10 +47,10 @@ mk_ca () {
     openssl req -new \
                 -x509 \
                 -nodes \
-	              -days 3650 \
+                -days 3650 \
                 -newkey rsa:4096 \
-	              -keyout ${CA_NAME}/${CA_NAME}.key \
-	              -out ${CA_NAME}/${CA_NAME}.crt
+                -keyout ${CA_NAME}/${CA_NAME}.key \
+                -out ${CA_NAME}/${CA_NAME}.crt
   else
     echo "Trying to create a CA key for an existing CA! This shouldn't happen!"
     exit 1
