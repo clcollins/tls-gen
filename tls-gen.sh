@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -o errexit
 
 usage () {
-  echo "usage: mkkey.sh -n HOST_NAME -c CA_NAME"
+  echo "usage: tls-gen.sh -n HOST_NAME -c CA_NAME"
   echo ""
   echo "If directory CA_NAME exists, cert will be signed by that CA"
   echo "If directory CA_NAME does not exist, a new CA will be created and used"
