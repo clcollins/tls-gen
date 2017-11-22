@@ -44,14 +44,13 @@ mk_ca () {
   if [[ ! -d $(pwd)/${CA_NAME} ]]
   then
     mkdir $CA_NAME
-    openssl req \
-      -new \
-      -x509 \
-      -nodes \
-	    -days 3650 \
-      -newkey rsa:4096 \
-	    -keyout ${CA_NAME}/${CA_NAME}.key \
-	    -out ${CA_NAME}/${CA_NAME}.crt
+    openssl req -new \
+                -x509 \
+                -nodes \
+	              -days 3650 \
+                -newkey rsa:4096 \
+	              -keyout ${CA_NAME}/${CA_NAME}.key \
+	              -out ${CA_NAME}/${CA_NAME}.crt
   else
     echo "Trying to create a CA key for an existing CA! This shouldn't happen!"
     exit 1
@@ -69,12 +68,14 @@ mk_csr () {
   else
     echo "$(pwd)/${CA_NAME}/${HOST_NAME} already exists"
   fi
+
   openssl genrsa -out ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.key 4096
+
   openssl req -subj "/CN=${HOST_NAME}" \
               -sha256 \
               -new \
-          -key ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.key \
-          -out ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.csr
+              -key ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.key \
+              -out ${CA_NAME}/${HOST_NAME}/${HOST_NAME}.csr
 }
 
 main () {
