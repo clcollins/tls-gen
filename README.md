@@ -1,3 +1,5 @@
+#This repository is archived and will no longer receive updates.
+
 # tls-gen
 Create a Certificate Authority and sign certs with it
 
